@@ -1,0 +1,144 @@
+import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User, UserRole, UserStatus } from './user.entity';
+import { CreateUserDto, UpdateUserDto } from './dto';
+
+@Injectable()
+export class UsersService {
+    constructor(
+        @InjectRepository(User)
+        private readonly userRepository: Repository<User>,
+    ) { }
+
+    async create(createUserDto: CreateUserDto): Promise<User> {
+        const existingUser = await this.userRepository.findOne({
+            where: { email: createUserDto.email },
+        });
+
+        if (existingUser) {
+            throw new ConflictException('User with this email already exists');
+        }
+
+        const user = this.userRepository.create(createUserDto);
+        return await this.userRepository.save(user);
+    }
+
+    async findAll(): Promise<User[]> {
+        return await this.userRepository.find({
+            select: ['id', 'email', 'firstName', 'lastName', 'role', 'status', 'avatar', 'createdAt'],
+        });
+    }
+
+    async findById(id: string): Promise<User> {
+        const user = await this.userRepository.findOne({
+            where: { id },
+            select: ['id', 'email', 'firstName', 'lastName', 'role', 'status', 'avatar', 'phoneNumber', 'emailVerified', 'lastLoginAt', 'createdAt', 'updatedAt'],
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user;
+    }
+
+    async findByEmail(email: string): Promise<User> {
+        const user = await this.userRepository.findOne({
+            where: { email },
+            select: ['id', 'email', 'firstName', 'lastName', 'password', 'role', 'status', 'emailVerified'],
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        return user;
+    }
+
+    async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+        const user = await this.findById(id);
+
+        // Check if email is being updated and if it's already taken
+        if (updateUserDto.email && updateUserDto.email !== user.email) {
+            const existingUser = await this.userRepository.findOne({
+                where: { email: updateUserDto.email },
+            });
+
+            if (existingUser) {
+                throw new ConflictException('User with this email already exists');
+            }
+        }
+
+        Object.assign(user, updateUserDto);
+        return await this.userRepository.save(user);
+    }
+
+    async updatePassword(id: string, newPassword: string): Promise<void> {
+        const user = await this.userRepository.findOne({
+            where: { id },
+            select: ['id', 'password'],
+        });
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        user.password = newPassword;
+        await this.userRepository.save(user);
+    }
+
+    async updateLastLogin(id: string): Promise<void> {
+        await this.userRepository.update(id, {
+            lastLoginAt: new Date(),
+        });
+    }
+
+    async updateStatus(id: string, status: UserStatus): Promise<User> {
+        const user = await this.findById(id);
+        user.status = status;
+        return await this.userRepository.save(user);
+    }
+
+    async updateRole(id: string, role: UserRole): Promise<User> {
+        const user = await this.findById(id);
+        user.role = role;
+        return await this.userRepository.save(user);
+    }
+
+    async delete(id: string): Promise<void> {
+        const user = await this.findById(id);
+        await this.userRepository.remove(user);
+    }
+
+    async verifyEmail(id: string): Promise<User> {
+        const user = await this.findById(id);
+        user.emailVerified = true;
+        return await this.userRepository.save(user);
+    }
+
+    async findActiveUsers(): Promise<User[]> {
+        return await this.userRepository.find({
+            where: { status: UserStatus.ACTIVE },
+            select: ['id', 'email', 'firstName', 'lastName', 'role', 'avatar', 'createdAt'],
+        });
+    }
+
+    async findUsersByRole(role: UserRole): Promise<User[]> {
+        return await this.userRepository.find({
+            where: { role },
+            select: ['id', 'email', 'firstName', 'lastName', 'status', 'avatar', 'createdAt'],
+        });
+    }
+
+    async countUsers(): Promise<number> {
+        return await this.userRepository.count();
+    }
+
+    async isEmailAvailable(email: string): Promise<boolean> {
+        const user = await this.userRepository.findOne({
+            where: { email },
+        });
+        return !user;
+    }
+} 
