@@ -1,20 +1,36 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { HealthModule } from './health/health.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3303,
-      username: 'root',
-      password: '123456',
-      database: 'todo_db',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '3303'),
+      username: process.env.DB_USERNAME || 'root',
+      password: process.env.DB_PASSWORD || '123456',
+      database: process.env.DB_DATABASE || 'todo_db',
       autoLoadEntities: true,
-      synchronize: true, // tự tạo table
+      synchronize: process.env.NODE_ENV === 'development',
     }),
+    AuthModule,
+    UsersModule,
+    HealthModule,
     CommonModule
   ]
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
