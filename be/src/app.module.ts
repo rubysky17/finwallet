@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { HealthModule } from './health/health.module';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -20,12 +21,13 @@ import { LoggerMiddleware } from './common/middleware/logger.middleware';
       password: process.env.DB_PASSWORD || '123456',
       database: process.env.DB_DATABASE || 'todo_db',
       autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV === 'development', // Only in development
+      synchronize: process.env.NODE_ENV === 'development',
     }),
     AuthModule,
     UsersModule,
     HealthModule,
-  ],
+    CommonModule
+  ]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

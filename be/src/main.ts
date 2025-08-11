@@ -1,9 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+// ! Modules
 import { AppModule } from './app.module';
+import { WinstonModule } from 'nest-winston';
+
+// ! Configs and Services
+import { winstonConfig } from './common/logging/winston.config';
+import { AppLoggerService } from './common/logging/logger.service';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger(winstonConfig),
+  });
 
   // Global validation pipe
   app.useGlobalPipes(
@@ -24,8 +33,13 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // Enable Logging
+  const logger = app.get(AppLoggerService);
+  app.useGlobalFilters(new AllExceptionsFilter(logger));
+
   const port = process.env.APP_PORT || 3000;
   await app.listen(port);
+
   console.log(`Application is running on: http://localhost:${port}`);
 }
 bootstrap();
