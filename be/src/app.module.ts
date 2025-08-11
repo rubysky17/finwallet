@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TodoModule } from './todo/todo.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { TodoModule } from './todo/todo.module';
       autoLoadEntities: true,
       synchronize: true, // tự tạo table
     }),
-    TodoModule,
+    CommonModule
   ]
 })
 export class AppModule { }

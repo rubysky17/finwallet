@@ -4,8 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.mysql
-    image: shop_dev                # tên image bạn muốn
-    container_name: shop_dev_mysql # tên container đang chạy
+    image: shop_dev               
+    container_name: shop_dev_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
