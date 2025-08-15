@@ -10,7 +10,7 @@ describe('AuthService', () => {
     let jwtService: JwtService;
 
     const mockUser: Partial<User> = {
-        id: '1',
+        id: 1,
         email: 'test@example.com',
         firstName: 'Test',
         lastName: 'User',

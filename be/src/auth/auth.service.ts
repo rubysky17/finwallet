@@ -1,11 +1,13 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { UsersService } from '../users/users.service';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { User } from '../users/user.entity';
 import { CreateUserDto } from '../users/dto';
 
+import { CategoryTemplateService } from 'src/categoryTemplate/category-template.service';
+import { UsersService } from '../users/users.service';
+import { JwtService } from '@nestjs/jwt';
+
 export interface JwtPayload {
-    sub: string;
+    sub: number;
     email: string;
     role: string;
 }
@@ -21,6 +23,7 @@ export class AuthService {
     constructor(
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
+        private readonly categoryTemplate: CategoryTemplateService
     ) { }
 
     async validateUser(email: string, password: string): Promise<User> {
@@ -77,6 +80,7 @@ export class AuthService {
 
     async register(createUserDto: CreateUserDto): Promise<LoginResponse> {
         const user = await this.usersService.create(createUserDto);
+        await this.categoryTemplate.createByUserId(user.id)
         return this.login(user);
     }
 
