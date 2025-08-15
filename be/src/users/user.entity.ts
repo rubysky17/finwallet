@@ -6,9 +6,12 @@ import {
     UpdateDateColumn,
     BeforeInsert,
     BeforeUpdate,
+    OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import * as bcrypt from 'bcrypt';
+import { CategoryTemplate } from 'src/categoryTemplate/category-template.entity';
+import { Wallet } from 'src/wallets/wallet.entity';
 
 export enum UserRole {
     USER = 'user',
@@ -24,8 +27,8 @@ export enum UserStatus {
 
 @Entity('users')
 export class User {
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column({ unique: true, length: 100 })
     email: string;
@@ -65,6 +68,12 @@ export class User {
 
     @Column({ nullable: true })
     lastLoginAt?: Date;
+
+    @OneToMany(() => CategoryTemplate, (categoryTemplate) => categoryTemplate.user)
+    categoryTemplates: CategoryTemplate[];
+
+    @OneToMany(() => Wallet, (wallet) => wallet.user)
+    wallets: Wallet[];
 
     @CreateDateColumn()
     createdAt: Date;

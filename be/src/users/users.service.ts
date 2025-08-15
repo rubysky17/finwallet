@@ -1,7 +1,11 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
+// ! Entities
 import { User, UserRole, UserStatus } from './user.entity';
+
+// ! DTOs
 import { CreateUserDto, UpdateUserDto } from './dto';
 
 @Injectable()
@@ -30,10 +34,11 @@ export class UsersService {
         });
     }
 
-    async findById(id: string): Promise<User> {
+    async findById(id: number): Promise<User> {
         const user = await this.userRepository.findOne({
             where: { id },
-            select: ['id', 'email', 'firstName', 'lastName', 'role', 'status', 'avatar', 'phoneNumber', 'emailVerified', 'lastLoginAt', 'createdAt', 'updatedAt'],
+            select: ['id', 'email', 'firstName', 'lastName', 'role', 'status', 'avatar', 'phoneNumber', 'emailVerified', 'lastLoginAt', 'createdAt', 'updatedAt', 'categoryTemplates'],
+            relations: ['categoryTemplates'],
         });
 
         if (!user) {
@@ -56,7 +61,7 @@ export class UsersService {
         return user;
     }
 
-    async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
         const user = await this.findById(id);
 
         // Check if email is being updated and if it's already taken
@@ -74,7 +79,7 @@ export class UsersService {
         return await this.userRepository.save(user);
     }
 
-    async updatePassword(id: string, newPassword: string): Promise<void> {
+    async updatePassword(id: number, newPassword: string): Promise<void> {
         const user = await this.userRepository.findOne({
             where: { id },
             select: ['id', 'password'],
@@ -88,30 +93,30 @@ export class UsersService {
         await this.userRepository.save(user);
     }
 
-    async updateLastLogin(id: string): Promise<void> {
+    async updateLastLogin(id: number): Promise<void> {
         await this.userRepository.update(id, {
             lastLoginAt: new Date(),
         });
     }
 
-    async updateStatus(id: string, status: UserStatus): Promise<User> {
+    async updateStatus(id: number, status: UserStatus): Promise<User> {
         const user = await this.findById(id);
         user.status = status;
         return await this.userRepository.save(user);
     }
 
-    async updateRole(id: string, role: UserRole): Promise<User> {
+    async updateRole(id: number, role: UserRole): Promise<User> {
         const user = await this.findById(id);
         user.role = role;
         return await this.userRepository.save(user);
     }
 
-    async delete(id: string): Promise<void> {
+    async delete(id: number): Promise<void> {
         const user = await this.findById(id);
         await this.userRepository.remove(user);
     }
 
-    async verifyEmail(id: string): Promise<User> {
+    async verifyEmail(id: number): Promise<User> {
         const user = await this.findById(id);
         user.emailVerified = true;
         return await this.userRepository.save(user);

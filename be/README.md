@@ -1,104 +1,166 @@
-# NestJS Authentication & Authorization System
+# FinWallet Backend API
 
-A scalable NestJS application with comprehensive authentication and authorization flow using best practices.
+A robust NestJS-based backend API for a financial wallet management application. This application provides comprehensive user authentication, wallet management, and category organization features.
 
-## Features
+## 🚀 Features
 
-- 🔐 **JWT-based Authentication**
-- 👥 **Role-based Authorization (RBAC)**
-- 🔒 **Password Hashing with bcrypt**
-- 📧 **Email Validation**
-- 🛡️ **Input Validation with class-validator**
-- 🏗️ **Scalable Architecture**
-- 📊 **User Management System**
-- 🔄 **Token Refresh Mechanism**
+- **User Authentication & Authorization**: JWT-based authentication with role-based access control
+- **Wallet Management**: Create, manage, and track multiple wallets with different types
+- **Category System**: Hierarchical category management for income and expenses
+- **Category Templates**: User-specific category templates for personalized organization
+- **Comprehensive Logging**: Winston-based logging with structured output
+- **Database Integration**: MySQL database with TypeORM for data persistence
+- **API Documentation**: Complete API documentation with examples
+- **Docker Support**: Containerized development environment
 
-## Tech Stack
+## 🏗️ Architecture
 
-- **Framework**: NestJS
-- **Database**: MySQL with TypeORM
-- **Authentication**: JWT + Passport.js
-- **Validation**: class-validator
-- **Password Hashing**: bcrypt
-- **Configuration**: @nestjs/config
+### Technology Stack
 
-## Project Structure
+- **Framework**: NestJS 11.x
+- **Database**: MySQL 8.0
+- **ORM**: TypeORM 0.3.x
+- **Authentication**: JWT with Passport.js
+- **Validation**: class-validator & class-transformer
+- **Logging**: Winston with nest-winston
+- **Testing**: Jest
+- **Containerization**: Docker & Docker Compose
+
+### Project Structure
 
 ```
 src/
-├── auth/
-│   ├── dto/
-│   │   ├── login.dto.ts
-│   │   ├── refresh-token.dto.ts
-│   │   └── index.ts
-│   ├── guards/
-│   │   ├── jwt-auth.guard.ts
-│   │   ├── local-auth.guard.ts
-│   │   └── roles.guard.ts
-│   ├── decorators/
-│   │   └── roles.decorator.ts
-│   ├── strategies/
-│   │   ├── jwt.strategy.ts
-│   │   └── local.strategy.ts
-│   ├── auth.controller.ts
-│   ├── auth.service.ts
-│   └── auth.module.ts
-├── users/
-│   ├── dto/
-│   │   ├── create-user.dto.ts
-│   │   ├── update-user.dto.ts
-│   │   └── index.ts
-│   ├── user.entity.ts
-│   ├── users.controller.ts
-│   ├── users.service.ts
-│   └── users.module.ts
-└── app.module.ts
+├── auth/                    # Authentication module
+│   ├── dto/                # Data transfer objects
+│   ├── guards/             # Authentication guards
+│   ├── strategies/         # Passport strategies
+│   ├── decorators/         # Custom decorators
+│   ├── auth.controller.ts  # Auth endpoints
+│   ├── auth.service.ts     # Auth business logic
+│   └── auth.module.ts      # Auth module configuration
+├── users/                  # User management module
+│   ├── dto/               # User DTOs
+│   ├── user.entity.ts     # User database model
+│   ├── users.controller.ts # User endpoints
+│   ├── users.service.ts   # User business logic
+│   └── users.module.ts    # User module configuration
+├── wallets/               # Wallet management module
+│   ├── wallet.entity.ts   # Wallet database model
+│   ├── wallet.controller.ts # Wallet endpoints
+│   └── wallet.module.ts   # Wallet module configuration
+├── categories/            # Category management module
+│   ├── dto/              # Category DTOs
+│   ├── category.entity.ts # Category database model
+│   ├── category.controller.ts # Category endpoints
+│   ├── category.service.ts # Category business logic
+│   └── category.module.ts # Category module configuration
+├── categoryTemplate/      # Category template module
+│   ├── dto/              # Template DTOs
+│   ├── category-template.entity.ts # Template database model
+│   ├── category-template.controller.ts # Template endpoints
+│   ├── category-template.service.ts # Template business logic
+│   └── category-template.module.ts # Template module configuration
+├── common/               # Shared utilities and configurations
+│   ├── filters/         # Exception filters
+│   ├── logging/         # Logging configuration
+│   ├── middleware/      # Custom middleware
+│   └── exceptions/      # Custom exceptions
+├── health/              # Health check module
+├── app.module.ts        # Root application module
+└── main.ts             # Application entry point
 ```
 
-## Installation
+## 🛠️ Installation & Setup
 
-1. **Install dependencies**:
+### Prerequisites
+
+- Node.js 18+ 
+- MySQL 8.0+
+- Docker & Docker Compose (optional)
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# Application
+APP_PORT=3000
+NODE_ENV=development
+
+# Database
+DB_HOST=localhost
+DB_PORT=3303
+DB_USERNAME=root
+DB_PASSWORD=123456
+DB_DATABASE=todo_db
+
+# JWT
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRES_IN=3600s
+
+# CORS
+CORS_ORIGIN=*
+```
+
+### Quick Start with Docker
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd finwallet/be
+   ```
+
+2. **Start the database**
+   ```bash
+   docker-compose up -d mysql
+   ```
+
+3. **Install dependencies**
    ```bash
    npm install
+   # or
+   yarn install
    ```
 
-2. **Environment Setup**:
-   Create a `.env` file in the root directory:
-   ```env
-   # Application
-   APP_PORT=3000
-   NODE_ENV=development
-
-   # Database
-   DB_HOST=localhost
-   DB_PORT=3303
-   DB_USERNAME=root
-   DB_PASSWORD=123456
-   DB_DATABASE=todo_db
-
-   # JWT
-   JWT_SECRET=your_super_secret_key_here
-   JWT_EXPIRES_IN=3600s
-   ```
-
-3. **Database Setup**:
-   - Ensure MySQL is running
-   - Create the database: `todo_db`
-   - The application will auto-create tables in development mode
-
-4. **Run the application**:
+4. **Run the application**
    ```bash
-   # Development
+   # Development mode
    npm run start:dev
-
-   # Production
+   
+   # Production mode
    npm run build
    npm run start:prod
    ```
 
-## API Endpoints
+### Manual Setup
 
-### Authentication
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Set up MySQL database**
+   - Create a database named `todo_db`
+   - Update `.env` with your database credentials
+
+3. **Run migrations** (if using migrations)
+   ```bash
+   npm run migration:run
+   ```
+
+4. **Start the application**
+   ```bash
+   npm run start:dev
+   ```
+
+## 📚 API Documentation
+
+### Base URL
+```
+http://localhost:3000
+```
+
+### Authentication Endpoints
 
 #### Register User
 ```http
@@ -137,12 +199,6 @@ POST /auth/verify
 Authorization: Bearer <jwt_token>
 ```
 
-#### Logout
-```http
-POST /auth/logout
-Authorization: Bearer <jwt_token>
-```
-
 ### User Management
 
 #### Get User Profile
@@ -151,155 +207,237 @@ GET /users/profile
 Authorization: Bearer <jwt_token>
 ```
 
-#### Update Profile
+#### Update User Profile
 ```http
-PATCH /users/profile
+PUT /users/profile
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 
 {
-  "firstName": "Jane",
+  "firstName": "John",
   "lastName": "Smith",
   "phoneNumber": "+1234567890"
 }
 ```
 
-#### Get All Users (Admin/Moderator)
+### Category Management
+
+#### Get All Categories
 ```http
-GET /users
+GET /categories
 Authorization: Bearer <jwt_token>
 ```
 
-#### Get User by ID (Admin/Moderator)
+#### Create Category
 ```http
-GET /users/:id
-Authorization: Bearer <jwt_token>
-```
-
-#### Update User (Admin)
-```http
-PATCH /users/:id
+POST /categories
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 
 {
-  "status": "active",
-  "role": "admin"
+  "name": "Groceries",
+  "type": "expense",
+  "parentId": null
 }
 ```
 
-#### Delete User (Admin)
+#### Update Category
 ```http
-DELETE /users/:id
+PUT /categories/:id
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+
+{
+  "name": "Food & Dining",
+  "type": "expense"
+}
+```
+
+#### Delete Category
+```http
+DELETE /categories/:id
 Authorization: Bearer <jwt_token>
 ```
 
-#### Get Active Users (Admin/Moderator)
+### Category Templates
+
+#### Get User Templates
 ```http
-GET /users/active/list
+GET /category-templates
 Authorization: Bearer <jwt_token>
 ```
 
-#### Get Users by Role (Admin)
+#### Create Template
 ```http
-GET /users/role/:role
+POST /category-templates
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+
+{
+  "name": "Personal Budget",
+  "type": "expense",
+  "parentId": null
+}
+```
+
+### Wallet Management
+
+#### Get User Wallets
+```http
+GET /wallets
 Authorization: Bearer <jwt_token>
 ```
 
-#### Get User Statistics (Admin)
+#### Create Wallet
 ```http
-GET /users/stats/count
+POST /wallets
 Authorization: Bearer <jwt_token>
+Content-Type: application/json
+
+{
+  "name": "Main Wallet",
+  "type": "basic",
+  "currencyFormat": "USD",
+  "currentBalance": 1000.00
+}
 ```
 
-#### Check Email Availability
-```http
-GET /users/check-email/:email
-Authorization: Bearer <jwt_token>
-```
+## 🗄️ Database Schema
 
-## User Roles
+### Users Table
+- `id`: Primary key
+- `email`: Unique email address
+- `firstName`, `lastName`: User names
+- `password`: Hashed password
+- `role`: User role (user, admin, moderator)
+- `status`: User status (active, inactive, suspended)
+- `avatar`: Profile picture URL
+- `phoneNumber`: Contact number
+- `emailVerified`: Email verification status
+- `lastLoginAt`: Last login timestamp
+- `createdAt`, `updatedAt`: Timestamps
 
-- **USER**: Basic user with limited access
-- **MODERATOR**: Can view users and manage basic operations
-- **ADMIN**: Full access to all operations
+### Categories Table
+- `id`: Primary key
+- `name`: Category name
+- `type`: Category type (expense, income, other)
+- `parentId`: Parent category reference
+- `isActive`: Category status
 
-## User Status
+### Category Templates Table
+- `id`: Primary key
+- `name`: Template name
+- `type`: Category type
+- `parentId`: Parent category reference
+- `userId`: User reference
+- `isActive`: Template status
 
-- **ACTIVE**: User can access the system
-- **INACTIVE**: User account is disabled
-- **SUSPENDED**: User account is temporarily suspended
+### Wallets Table
+- `id`: Primary key
+- `type`: Wallet type (basic, linked, goal, credit, other)
+- `userId`: User reference
+- `currencyFormat`: Currency format
+- `currentBalance`: Current balance
+- `enabled`: Wallet status
+- `allowNotifications`: Notification settings
+- `archived`: Archive status
 
-## Security Features
+## 🔧 Development
 
-### Password Requirements
-- Minimum 8 characters
-- At least one uppercase letter
-- At least one lowercase letter
-- At least one number
-- At least one special character
+### Available Scripts
 
-### JWT Token
-- Configurable expiration time
-- Contains user ID, email, and role
-- Automatic token validation
-
-### Input Validation
-- Email format validation
-- Password strength validation
-- Required field validation
-- Data type validation
-
-## Best Practices Implemented
-
-1. **Separation of Concerns**: Clear separation between auth and user modules
-2. **Dependency Injection**: Proper use of NestJS DI container
-3. **Guards and Decorators**: Role-based access control
-4. **DTOs**: Type-safe request/response handling
-5. **Error Handling**: Comprehensive error responses
-6. **Environment Configuration**: Secure configuration management
-7. **Database Security**: Password hashing and secure queries
-8. **Input Validation**: Comprehensive validation with class-validator
-9. **Scalable Architecture**: Modular design for easy scaling
-10. **Type Safety**: Full TypeScript implementation
-
-## Development
-
-### Running Tests
 ```bash
-npm run test
-npm run test:watch
-npm run test:cov
+# Development
+npm run start:dev          # Start in development mode with hot reload
+npm run start:debug        # Start in debug mode
+
+# Production
+npm run build              # Build the application
+npm run start:prod         # Start in production mode
+
+# Code Quality
+npm run lint               # Run ESLint
+npm run format             # Format code with Prettier
+
+# Testing
+npm run test               # Run unit tests
+npm run test:watch         # Run tests in watch mode
+npm run test:cov           # Run tests with coverage
+npm run test:e2e           # Run end-to-end tests
 ```
 
-### Code Formatting
+### Code Style
+
+This project uses:
+- **ESLint** for code linting
+- **Prettier** for code formatting
+- **TypeScript** for type safety
+
+### Testing
+
+The project includes:
+- **Unit tests** with Jest
+- **E2E tests** for API endpoints
+- **Test coverage** reporting
+
+## 🔒 Security Features
+
+- **JWT Authentication**: Secure token-based authentication
+- **Password Hashing**: bcrypt for password security
+- **Input Validation**: Comprehensive DTO validation
+- **CORS Protection**: Configurable CORS settings
+- **Role-based Access**: User role management
+- **Request Logging**: Comprehensive request/response logging
+
+## 📊 Logging
+
+The application uses Winston for structured logging with:
+- **Console output** for development
+- **File logging** for production
+- **Request/response logging** middleware
+- **Error tracking** with stack traces
+
+## 🐳 Docker
+
+### Development Environment
+
 ```bash
-npm run format
-npm run lint
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
 ```
 
-### Database Migrations
-The application uses TypeORM's `synchronize: true` in development mode. For production, implement proper migrations.
+### Production Deployment
 
-## Production Considerations
+1. Build the Docker image
+2. Configure environment variables
+3. Deploy to your preferred platform
 
-1. **Environment Variables**: Use strong JWT secrets
-2. **Database**: Use connection pooling and proper indexing
-3. **Rate Limiting**: Implement rate limiting for auth endpoints
-4. **Logging**: Add comprehensive logging
-5. **Monitoring**: Implement health checks and monitoring
-6. **Security Headers**: Add security headers middleware
-7. **CORS**: Configure CORS properly
-8. **HTTPS**: Use HTTPS in production
+## 🤝 Contributing
 
-## Contributing
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
 
-1. Follow the existing code structure
-2. Add proper validation for new endpoints
-3. Include error handling
-4. Write tests for new features
-5. Update documentation
+## 📝 License
 
-## License
+This project is licensed under the UNLICENSED license.
 
-This project is licensed under the MIT License.
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Check the API documentation
+- Review the logs for debugging
+
+## 🔄 Version History
+
+- **v0.0.1**: Initial release with basic authentication and CRUD operations
