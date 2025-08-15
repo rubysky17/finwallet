@@ -21,7 +21,9 @@ import { UserRole } from './user.entity';
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
-    constructor(private readonly usersService: UsersService) { }
+    constructor(
+        private readonly usersService: UsersService,
+    ) { }
 
     @Post()
     @HttpCode(HttpStatus.CREATED)
@@ -54,7 +56,7 @@ export class UsersController {
 
     @Get(':id')
     @Roles(UserRole.ADMIN, UserRole.MODERATOR)
-    async findOne(@Param('id') id: string) {
+    async findOne(@Param('id') id: number) {
         const user = await this.usersService.findById(id);
         return {
             message: 'User retrieved successfully',
@@ -73,7 +75,7 @@ export class UsersController {
 
     @Patch(':id')
     @Roles(UserRole.ADMIN)
-    async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
         const user = await this.usersService.update(id, updateUserDto);
         return {
             message: 'User updated successfully',
@@ -84,7 +86,7 @@ export class UsersController {
     @Delete(':id')
     @Roles(UserRole.ADMIN)
     @HttpCode(HttpStatus.NO_CONTENT)
-    async remove(@Param('id') id: string) {
+    async remove(@Param('id') id: number) {
         await this.usersService.delete(id);
         return {
             message: 'User deleted successfully',
