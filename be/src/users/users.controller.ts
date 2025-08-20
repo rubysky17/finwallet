@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import {
     Controller,
     Get,
@@ -150,29 +149,3 @@ export class UsersController {
         };
     }
 } 
-=======
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
-import { UsersService } from './users.service';
-
-// ! DTOs
-import { CreateUserDto } from './dto';
-
-@Controller('users')
-export class UsersController {
-    constructor(private readonly userService: UsersService) { }
-
-    // ! Tạo người dùng
-    @Post()
-    @HttpCode(HttpStatus.CREATED)
-    async create(@Body() createUserDto: CreateUserDto) {
-        const user = this.userService.create(createUserDto);
-
-        return {
-            message: "User created successffully",
-            data: user
-        }
-    }
-
-
-}
->>>>>>> Stashed changes

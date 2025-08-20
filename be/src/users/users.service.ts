@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,23 +13,11 @@ import { WalletType } from 'src/wallets/wallet.entity';
 import { WalletService } from 'src/wallets/wallet.service';
 import { UserWalletService } from 'src/userWallet/userWallet.service';
 import { CategoryTemplateService } from 'src/categoryTemplate/category-template.service';
-=======
-import { ConflictException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-
-// ! Dtos
-import { CreateUserDto } from './dto';
-
-// ! Entity
-import { User } from './user.entity';
->>>>>>> Stashed changes
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
-<<<<<<< Updated upstream
         private readonly userRepository: Repository<User>,
         private readonly walletService: WalletService,
         private readonly userWalletService: UserWalletService,
@@ -231,21 +218,3 @@ export class UsersService {
         return findUser
     }
 } 
-=======
-        private readonly userRepository: Repository<User>
-    ) { }
-
-    async create(createUserDto: CreateUserDto) {
-        const isExistUser = await this.userRepository.findOne({
-            where: { email: createUserDto.email }
-        })
-
-        if (isExistUser) {
-            throw new ConflictException('User with this email already exists.');
-        };
-
-        const user = this.userRepository.create(createUserDto);
-        return await this.userRepository.save(user);
-    }
-}
->>>>>>> Stashed changes
