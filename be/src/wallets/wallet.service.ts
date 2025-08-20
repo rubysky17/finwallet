@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Wallet, WalletType } from './wallet.entity';
@@ -11,11 +11,8 @@ export class WalletService {
         private readonly walletRepository: Repository<Wallet>,
     ) { }
 
-    async create(createWalletDto: CreateWalletDto, userId: number): Promise<Wallet> {
-        const wallet = this.walletRepository.create({
-            ...createWalletDto,
-            userId,
-        });
+    async create(createWalletDto: CreateWalletDto): Promise<Wallet> {
+        const wallet = this.walletRepository.create(createWalletDto);
 
         return await this.walletRepository.save(wallet);
     }
@@ -27,9 +24,9 @@ export class WalletService {
         });
     }
 
-    async findOne(id: number, userId: number): Promise<Wallet> {
+    async findOneById(id: number): Promise<Wallet> {
         const wallet = await this.walletRepository.findOne({
-            where: { id, userId },
+            where: { id },
         });
 
         if (!wallet) {
@@ -39,29 +36,41 @@ export class WalletService {
         return wallet;
     }
 
-    async update(id: number, updateWalletDto: UpdateWalletDto, userId: number): Promise<Wallet> {
-        const wallet = await this.findOne(id, userId);
+    async findOneByUserId(userId: number): Promise<Wallet> {
+        const wallet = await this.walletRepository.findOne({
+            where: { userId },
+        });
 
-        Object.assign(wallet, updateWalletDto);
-        return await this.walletRepository.save(wallet);
+        if (!wallet) {
+            throw new NotFoundException(`Wallet with UserId ${userId} not found`);
+        }
+
+        return wallet;
     }
 
-    async remove(id: number, userId: number): Promise<void> {
-        const wallet = await this.findOne(id, userId);
-        await this.walletRepository.remove(wallet);
-    }
+    // async update(id: number, updateWalletDto: UpdateWalletDto, userId: number): Promise<Wallet> {
+    //     const wallet = await this.findOne(id, userId);
 
-    async archive(id: number, userId: number): Promise<Wallet> {
-        const wallet = await this.findOne(id, userId);
-        wallet.archived = true;
-        return await this.walletRepository.save(wallet);
-    }
+    //     Object.assign(wallet, updateWalletDto);
+    //     return await this.walletRepository.save(wallet);
+    // }
 
-    async updateBalance(id: number, amount: number, userId: number): Promise<Wallet> {
-        const wallet = await this.findOne(id, userId);
-        wallet.currentBalance += amount;
-        return await this.walletRepository.save(wallet);
-    }
+    // async remove(id: number, userId: number): Promise<void> {
+    //     const wallet = await this.findOne(id, userId);
+    //     await this.walletRepository.remove(wallet);
+    // }
+
+    // async archive(id: number, userId: number): Promise<Wallet> {
+    //     const wallet = await this.findOne(id, userId);
+    //     wallet.archived = true;
+    //     return await this.walletRepository.save(wallet);
+    // }
+
+    // async updateBalance(id: number, amount: number, userId: number): Promise<Wallet> {
+    //     const wallet = await this.findOne(id, userId);
+    //     wallet.currentBalance += amount;
+    //     return await this.walletRepository.save(wallet);
+    // }
 
     async getWalletStats(userId: number): Promise<any> {
         const wallets = await this.findAll(userId);

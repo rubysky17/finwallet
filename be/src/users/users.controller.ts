@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import {
     Controller,
     Get,
@@ -13,10 +14,15 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto';
+// ! Guards
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
+// ! Entities
 import { UserRole } from './user.entity';
+// ! Decorators
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Public } from 'src/auth/decorators/public.decorator';
+import { Token } from 'src/auth/decorators/user.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -35,6 +41,17 @@ export class UsersController {
         };
     }
 
+    @Public()
+    @Post("/demo")
+    @HttpCode(HttpStatus.CREATED)
+    async createDemo(@Body() createUserDto: CreateUserDto) {
+        const user = await this.usersService.create(createUserDto);
+        return {
+            message: 'User created successfully',
+            data: user,
+        };
+    }
+
     @Get()
     @Roles(UserRole.ADMIN, UserRole.MODERATOR)
     async findAll() {
@@ -46,16 +63,17 @@ export class UsersController {
     }
 
     @Get('profile')
-    async getProfile(@Request() req) {
-        const user = await this.usersService.findById(req.user.id);
+    async getProfile(@Token() token) {
+        const user = await this.usersService.findById(token.id);
         return {
             message: 'Profile retrieved successfully',
             data: user,
         };
     }
 
+    @Public()
     @Get(':id')
-    @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+    // @Roles(UserRole.ADMIN, UserRole.MODERATOR)
     async findOne(@Param('id') id: number) {
         const user = await this.usersService.findById(id);
         return {
@@ -132,3 +150,29 @@ export class UsersController {
         };
     }
 } 
+=======
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { UsersService } from './users.service';
+
+// ! DTOs
+import { CreateUserDto } from './dto';
+
+@Controller('users')
+export class UsersController {
+    constructor(private readonly userService: UsersService) { }
+
+    // ! Tạo người dùng
+    @Post()
+    @HttpCode(HttpStatus.CREATED)
+    async create(@Body() createUserDto: CreateUserDto) {
+        const user = this.userService.create(createUserDto);
+
+        return {
+            message: "User created successffully",
+            data: user
+        }
+    }
+
+
+}
+>>>>>>> Stashed changes

@@ -1,6 +1,11 @@
 import { NestFactory } from '@nestjs/core';
+<<<<<<< Updated upstream
 import { ValidationPipe, Logger } from '@nestjs/common';
 // ! Modules
+=======
+import { ValidationPipe } from '@nestjs/common';
+
+>>>>>>> Stashed changes
 import { AppModule } from './app.module';
 import { WinstonModule } from 'nest-winston';
 
@@ -10,6 +15,7 @@ import { AppLoggerService } from './common/logging/logger.service';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 
 async function bootstrap() {
+<<<<<<< Updated upstream
   const logger = new Logger('Bootstrap');
 
   try {
@@ -62,6 +68,32 @@ async function bootstrap() {
     logger.error('Failed to start application:', error);
     process.exit(1);
   }
+=======
+  const app = await NestFactory.create(AppModule);
+
+  // ! Global validation pipe (Validation body)
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true, // Sẽ verify các property không được định nghĩa trong DTO
+      forbidNonWhitelisted: true, // Nếu có property không được định nghĩa trong DTO thì sẽ báo lỗi
+      transform: true, // Tự động chuyển đổi kiểu dữ liệu
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
+    })
+  );
+
+  // ! Enbale CORS
+  app.enableCors({
+    origin: process.env.CORS_ORIGIN || "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+  });
+
+  const port = process.env.APP_PORT ?? 3000;
+  await app.listen(port);
+  console.log(`Ứng dụng đang chạy trên: http://localhost:${port}`)
+>>>>>>> Stashed changes
 }
 
 bootstrap();

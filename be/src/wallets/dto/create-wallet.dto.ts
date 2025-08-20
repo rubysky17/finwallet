@@ -24,11 +24,6 @@ export class CreateWalletDto {
     @IsOptional()
     allowNotifications?: boolean;
 
-    @IsArray()
-    @IsOptional()
-    categories?: Array<any>;
-
-    @IsArray()
-    @IsOptional()
-    membersInclude?: Array<any>;
+    @IsNumber()
+    userId: number
 } 
