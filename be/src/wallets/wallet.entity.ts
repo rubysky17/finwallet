@@ -6,9 +6,12 @@ import {
     UpdateDateColumn,
     ManyToOne,
     JoinColumn,
-    OneToMany
+    OneToMany,
+    ManyToMany
 } from "typeorm";
 import { User } from "../users/user.entity";
+import { CategoryTemplate } from "src/categoryTemplate/category-template.entity";
+import { UserWallet } from "src/userWallet/userWallet.entity";
 
 export enum WalletType {
     BASIC = "basic",
@@ -33,16 +36,10 @@ export class Wallet {
     })
     type: WalletType;
 
-    @Column({ name: 'user_id' })
+    @Column({ name: 'user_id', select: false })
     userId: number;
 
-    @ManyToOne(() => User, (user) => user.wallets, {
-        onDelete: 'CASCADE',
-    })
-    @JoinColumn({ name: 'user_id' })
-    user: User;
-
-    @Column({ length: 10, default: 'USD' })
+    @Column({ length: 10, default: 'VND' })
     currencyFormat: string;
 
     @Column({ type: 'decimal', precision: 15, scale: 2, default: 0 })
@@ -57,11 +54,11 @@ export class Wallet {
     @Column({ default: false })
     archived: boolean;
 
-    @Column({ type: 'json', nullable: true })
-    categories: Array<any>;
+    @OneToMany(() => CategoryTemplate, (categoryTemplate) => categoryTemplate.user)
+    categoryTemplates: CategoryTemplate[];
 
-    @Column({ type: 'json', nullable: true })
-    membersInclude: Array<any>;
+    @OneToMany(() => UserWallet, (userWallet) => userWallet.wallet)
+    userWallets: UserWallet[];
 
     @CreateDateColumn()
     createdAt: Date;

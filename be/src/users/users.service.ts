@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -5,39 +6,100 @@ import { Repository } from 'typeorm';
 // ! Entities
 import { User, UserRole, UserStatus } from './user.entity';
 
-// ! DTOs
+// ! DTOs & Entity
 import { CreateUserDto, UpdateUserDto } from './dto';
+import { WalletType } from 'src/wallets/wallet.entity';
+
+// ! Services
+import { WalletService } from 'src/wallets/wallet.service';
+import { UserWalletService } from 'src/userWallet/userWallet.service';
+import { CategoryTemplateService } from 'src/categoryTemplate/category-template.service';
+=======
+import { ConflictException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+// ! Dtos
+import { CreateUserDto } from './dto';
+
+// ! Entity
+import { User } from './user.entity';
+>>>>>>> Stashed changes
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User)
+<<<<<<< Updated upstream
         private readonly userRepository: Repository<User>,
+        private readonly walletService: WalletService,
+        private readonly userWalletService: UserWalletService,
+        private readonly categoryTemplateService: CategoryTemplateService
     ) { }
 
     async create(createUserDto: CreateUserDto): Promise<User> {
-        const existingUser = await this.userRepository.findOne({
-            where: { email: createUserDto.email },
-        });
+        // ! Get User With Email
+        const existingUser = await this.findUserByEmail(createUserDto.email)
 
+        // ! If exist [Not] allow create User
         if (existingUser) {
             throw new ConflictException('User with this email already exists');
         }
 
         const user = this.userRepository.create(createUserDto);
-        return await this.userRepository.save(user);
+        const userCreated = await this.userRepository.save(user);
+
+        // ! If create success create default wallet
+        const walletCreated = await this.walletService.create({
+            userId: Number(userCreated.id),
+            name: "Cash",
+            type: WalletType.BASIC
+        });
+
+        // ! After create wallet linked userId and WalletId with userWallet table
+        await this.userWalletService.create({
+            userId: userCreated.id,
+            walletId: walletCreated.id
+        })
+
+        await this.categoryTemplateService.createByUserId(userCreated.id)
+
+        return userCreated
     }
 
     async findAll(): Promise<User[]> {
         return await this.userRepository.find({
-            select: ['id', 'email', 'firstName', 'lastName', 'role', 'status', 'avatar', 'createdAt'],
+            select: [
+                'id',
+                'email',
+                'firstName',
+                'lastName',
+                'role',
+                'status',
+                'avatar',
+                'createdAt'
+            ],
         });
     }
 
-    async findById(id: number): Promise<User> {
+    async findById(id: number): Promise<any> {
         const user = await this.userRepository.findOne({
             where: { id },
-            select: ['id', 'email', 'firstName', 'lastName', 'role', 'status', 'avatar', 'phoneNumber', 'emailVerified', 'lastLoginAt', 'createdAt', 'updatedAt', 'categoryTemplates'],
+            select: [
+                'id',
+                'email',
+                'firstName',
+                'lastName',
+                'role',
+                'status',
+                'avatar',
+                'phoneNumber',
+                'emailVerified',
+                'lastLoginAt',
+                'createdAt',
+                'updatedAt',
+                'categoryTemplates',
+            ],
             relations: ['categoryTemplates'],
         });
 
@@ -45,13 +107,27 @@ export class UsersService {
             throw new NotFoundException('User not found');
         }
 
-        return user;
+        const getWallet = await this.userWalletService.getWalletWithUsers(id)
+
+        return {
+            ...user,
+            wallet: getWallet
+        };
     }
 
     async findByEmail(email: string): Promise<User> {
         const user = await this.userRepository.findOne({
             where: { email },
-            select: ['id', 'email', 'firstName', 'lastName', 'password', 'role', 'status', 'emailVerified'],
+            select: [
+                'id',
+                'email',
+                'firstName',
+                'lastName',
+                'password',
+                'role',
+                'status',
+                'emailVerified'
+            ],
         });
 
         if (!user) {
@@ -146,4 +222,30 @@ export class UsersService {
         });
         return !user;
     }
+
+    async findUserByEmail(email: string) {
+        const findUser = await this.userRepository.findOne({
+            where: { email },
+        });
+
+        return findUser
+    }
 } 
+=======
+        private readonly userRepository: Repository<User>
+    ) { }
+
+    async create(createUserDto: CreateUserDto) {
+        const isExistUser = await this.userRepository.findOne({
+            where: { email: createUserDto.email }
+        })
+
+        if (isExistUser) {
+            throw new ConflictException('User with this email already exists.');
+        };
+
+        const user = this.userRepository.create(createUserDto);
+        return await this.userRepository.save(user);
+    }
+}
+>>>>>>> Stashed changes
